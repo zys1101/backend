@@ -1,10 +1,13 @@
 package com.contact.config;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.contact.common.utils.IdGenerator;
 import com.contact.entity.Contact;
+import com.contact.entity.ContactPic;
 import com.contact.entity.Matter;
 import com.contact.entity.UserInfo;
 import com.contact.mapper.ContactMapper;
+import com.contact.mapper.ContactPicMapper;
 import com.contact.mapper.MatterMapper;
 import com.contact.mapper.UserInfoMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,9 @@ import java.util.List;
 
 /**
  * 测试数据初始化器 — 仅在数据库为空时自动插入
+ * <p>
+ * 每次启动时先从DB查询已有最大ID，初始化IdGenerator计数器，
+ * 避免应用重启后计数器重置导致主键冲突。
  */
 @Slf4j
 @Component
@@ -31,10 +37,14 @@ public class DataInitRunner implements CommandLineRunner {
     private final UserInfoMapper userInfoMapper;
     private final ContactMapper contactMapper;
     private final MatterMapper matterMapper;
+    private final ContactPicMapper contactPicMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
+        // ---- 每次启动时从DB初始化IdGenerator计数器 ----
+        initIdGeneratorCounters();
+
         Long count = contactMapper.selectCount(null);
         if (count != null && count > 0) {
             log.info("测试数据已存在 (contacts={}), 跳过初始化", count);
@@ -50,6 +60,49 @@ public class DataInitRunner implements CommandLineRunner {
         log.info("测试数据初始化完成: users={}, contacts={}, matters={}",
                 users.size(), contacts.size(),
                 matterMapper.selectCount(null));
+    }
+
+    /**
+     * 从数据库查询各表最大ID，初始化IdGenerator计数器。
+     * 此方法必须在任何 insert 操作之前调用。
+     */
+    private void initIdGeneratorCounters() {
+        String maxUserId = queryMaxUserId();
+        String maxContactId = queryMaxContactId();
+        String maxMatterId = queryMaxMatterId();
+        String maxPictureId = queryMaxPictureId();
+
+        IdGenerator.initFromExistingMaxId(maxUserId, maxContactId, maxMatterId, maxPictureId);
+        log.info("IdGenerator计数器已从DB初始化: user={}, contact={}, matter={}, picture={}",
+                maxUserId, maxContactId, maxMatterId, maxPictureId);
+    }
+
+    private String queryMaxUserId() {
+        LambdaQueryWrapper<UserInfo> w = new LambdaQueryWrapper<>();
+        w.select(UserInfo::getUserId).orderByDesc(UserInfo::getUserId).last("LIMIT 1");
+        UserInfo entity = userInfoMapper.selectOne(w);
+        return entity != null ? entity.getUserId() : null;
+    }
+
+    private String queryMaxContactId() {
+        LambdaQueryWrapper<Contact> w = new LambdaQueryWrapper<>();
+        w.select(Contact::getCtId).orderByDesc(Contact::getCtId).last("LIMIT 1");
+        Contact entity = contactMapper.selectOne(w);
+        return entity != null ? entity.getCtId() : null;
+    }
+
+    private String queryMaxMatterId() {
+        LambdaQueryWrapper<Matter> w = new LambdaQueryWrapper<>();
+        w.select(Matter::getMatterId).orderByDesc(Matter::getMatterId).last("LIMIT 1");
+        Matter entity = matterMapper.selectOne(w);
+        return entity != null ? entity.getMatterId() : null;
+    }
+
+    private String queryMaxPictureId() {
+        LambdaQueryWrapper<ContactPic> w = new LambdaQueryWrapper<>();
+        w.select(ContactPic::getPicId).orderByDesc(ContactPic::getPicId).last("LIMIT 1");
+        ContactPic entity = contactPicMapper.selectOne(w);
+        return entity != null ? entity.getPicId() : null;
     }
 
     // ==================== 用户 ====================
