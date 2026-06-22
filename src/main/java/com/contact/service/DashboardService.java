@@ -1,18 +1,14 @@
 package com.contact.service;
 
-import com.contact.vo.DashboardVO;
+import com.contact.vo.DashboardStatsVO;
 
 /**
- * Dashboard仪表盘服务接口
- *
- * @author Contact Manager
+ * Dashboard 统计服务接口
  */
 public interface DashboardService {
 
     /**
-     * 获取Dashboard统计数据
-     *
-     * @return Dashboard数据
+     * 获取 Dashboard 统计数据
      */
-    DashboardVO getDashboardData();
+    DashboardStatsVO getDashboardStats();
 }

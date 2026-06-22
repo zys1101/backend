@@ -2,7 +2,7 @@ package com.contact.controller;
 
 import com.contact.common.result.Result;
 import com.contact.service.DashboardService;
-import com.contact.vo.DashboardVO;
+import com.contact.vo.DashboardStatsVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Dashboard仪表盘控制器
- *
- * @author Contact Manager
+ * Dashboard控制器
  */
-@Tag(name = "Dashboard仪表盘", description = "Dashboard数据统计接口")
+@Tag(name = "Dashboard", description = "数据统计看板接口")
 @RestController
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor
@@ -26,10 +24,10 @@ public class DashboardController {
     /**
      * 获取Dashboard统计数据
      */
-    @Operation(summary = "获取Dashboard数据", description = "获取仪表盘统计数据，包括统计卡片、图表数据、生日提醒等")
+    @Operation(summary = "获取Dashboard统计数据", description = "获取联系人和事项的整体统计数据")
     @GetMapping("/stats")
-    public Result<DashboardVO> getDashboardStats() {
-        DashboardVO dashboardVO = dashboardService.getDashboardData();
-        return Result.success(dashboardVO);
+    public Result<DashboardStatsVO> getDashboardStats() {
+        DashboardStatsVO stats = dashboardService.getDashboardStats();
+        return Result.success(stats);
     }
 }

@@ -1,8 +1,24 @@
 package com.contact.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.contact.common.annotation.OperationLog;
 import com.contact.common.result.PageResult;
 import com.contact.common.result.Result;
+import com.contact.dto.ContactCreateDTO;
+import com.contact.dto.ContactUpdateDTO;
+import com.contact.service.ContactService;
+import com.contact.vo.ContactDetailVO;
+import com.contact.vo.ContactVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 import com.contact.dto.ContactCreateDTO;
 import com.contact.dto.ContactUpdateDTO;
 import com.contact.service.ContactService;
@@ -75,6 +91,7 @@ public class ContactController {
      * 新增联系人
      */
     @Operation(summary = "新增联系人", description = "创建新的联系人")
+    @OperationLog(value = "新增", desc = "新增联系人")
     @PostMapping
     public Result<Map<String, String>> createContact(@Valid @RequestBody ContactCreateDTO createDTO) {
         String ctId = contactService.createContact(createDTO);
@@ -89,6 +106,7 @@ public class ContactController {
      * 更新联系人
      */
     @Operation(summary = "更新联系人", description = "更新联系人信息")
+    @OperationLog(value = "修改", desc = "修改联系人")
     @PutMapping("/{id}")
     public Result<Void> updateContact(
             @Parameter(description = "联系人ID") @PathVariable String id,
@@ -102,6 +120,7 @@ public class ContactController {
      * 删除联系人
      */
     @Operation(summary = "删除联系人", description = "删除联系人及其相关数据")
+    @OperationLog(value = "删除", desc = "删除联系人")
     @DeleteMapping("/{id}")
     public Result<Void> deleteContact(
             @Parameter(description = "联系人ID") @PathVariable String id) {
@@ -131,6 +150,7 @@ public class ContactController {
      * 加入黑名单
      */
     @Operation(summary = "加入黑名单", description = "将联系人加入黑名单")
+    @OperationLog(value = "拉黑", desc = "将联系人加入黑名单")
     @PostMapping("/{id}/blacklist")
     public Result<Void> addToBlacklist(
             @Parameter(description = "联系人ID") @PathVariable String id) {

@@ -1,6 +1,7 @@
 package com.contact.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.contact.common.annotation.OperationLog;
 import com.contact.common.result.PageResult;
 import com.contact.common.result.Result;
 import com.contact.service.ContactService;
@@ -54,6 +55,7 @@ public class BlacklistController {
     /**
      * 恢复联系人
      */
+    @OperationLog(value = "恢复", desc = "从黑名单中恢复联系人")
     @Operation(summary = "恢复联系人", description = "将联系人从黑名单中恢复")
     @DeleteMapping("/{id}")
     public Result<Void> restoreContact(

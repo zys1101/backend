@@ -1,6 +1,7 @@
 package com.contact.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.contact.common.annotation.OperationLog;
 import com.contact.common.result.PageResult;
 import com.contact.common.result.Result;
 import com.contact.dto.MatterCreateDTO;
@@ -73,6 +74,7 @@ public class ReminderController {
      * 新增事项
      */
     @Operation(summary = "新增事项", description = "创建新的事项提醒")
+    @OperationLog(value = "新增", desc = "新增事项")
     @PostMapping
     public Result<Map<String, String>> createMatter(@Valid @RequestBody MatterCreateDTO createDTO) {
         String matterId = matterService.createMatter(createDTO);

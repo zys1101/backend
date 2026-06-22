@@ -11,14 +11,19 @@ import com.contact.dto.ContactCreateDTO;
 import com.contact.dto.ContactUpdateDTO;
 import com.contact.entity.Contact;
 import com.contact.entity.ContactPic;
+import com.contact.entity.ContactTag;
+import com.contact.entity.ContactTagRel;
 import com.contact.entity.Matter;
 import com.contact.mapper.ContactMapper;
 import com.contact.mapper.ContactPicMapper;
+import com.contact.mapper.ContactTagMapper;
+import com.contact.mapper.ContactTagRelMapper;
 import com.contact.mapper.MatterMapper;
 import com.contact.service.ContactService;
 import com.contact.vo.ContactDetailVO;
 import com.contact.vo.ContactVO;
 import com.contact.vo.MatterVO;
+import com.contact.vo.TagVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +58,8 @@ public class ContactServiceImpl implements ContactService {
     private final ContactMapper contactMapper;
     private final ContactPicMapper contactPicMapper;
     private final MatterMapper matterMapper;
+    private final ContactTagMapper contactTagMapper;
+    private final ContactTagRelMapper contactTagRelMapper;
 
     @Value("${file.upload.avatar-path:uploads/avatar/}")
     private String avatarPath;
@@ -161,6 +169,9 @@ public class ContactServiceImpl implements ContactService {
                 .map(this::convertMatterToVO)
                 .collect(Collectors.toList());
         detailVO.setMatters(matterVOList);
+
+        // 获取标签列表
+        detailVO.setTags(getTagVOsForContact(ctId));
 
         return detailVO;
     }
@@ -314,13 +325,7 @@ public class ContactServiceImpl implements ContactService {
 
         try {
             // 创建上传目录
-            // Path uploadPath = Paths.get(avatarPath);
-            Path uploadPath = Paths.get(
-                    System.getProperty("user.dir"),
-                    avatarPath
-            ).toAbsolutePath();
-
-            log.info("上传目录: {}", uploadPath);
+            Path uploadPath = Paths.get(avatarPath);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
@@ -479,6 +484,9 @@ public class ContactServiceImpl implements ContactService {
             vo.setAvatar("/uploads/avatar/" + contactPic.getPicName());
         }
 
+        // 获取标签列表
+        vo.setTags(getTagNamesForContact(contact.getCtId()));
+
         return vo;
     }
 
@@ -496,5 +504,51 @@ public class ContactServiceImpl implements ContactService {
         }
 
         return vo;
+    }
+
+    /**
+     * 获取联系人标签名称列表
+     */
+    private List<String> getTagNamesForContact(String ctId) {
+        LambdaQueryWrapper<ContactTagRel> relQuery = new LambdaQueryWrapper<>();
+        relQuery.eq(ContactTagRel::getCtId, ctId);
+        List<ContactTagRel> rels = contactTagRelMapper.selectList(relQuery);
+
+        if (rels.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> tagIds = rels.stream().map(ContactTagRel::getTagId).collect(Collectors.toList());
+        LambdaQueryWrapper<ContactTag> tagQuery = new LambdaQueryWrapper<>();
+        tagQuery.in(ContactTag::getTagId, tagIds);
+        List<ContactTag> tags = contactTagMapper.selectList(tagQuery);
+
+        return tags.stream().map(ContactTag::getTagName).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取联系人标签VO列表
+     */
+    private List<TagVO> getTagVOsForContact(String ctId) {
+        LambdaQueryWrapper<ContactTagRel> relQuery = new LambdaQueryWrapper<>();
+        relQuery.eq(ContactTagRel::getCtId, ctId);
+        List<ContactTagRel> rels = contactTagRelMapper.selectList(relQuery);
+
+        if (rels.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> tagIds = rels.stream().map(ContactTagRel::getTagId).collect(Collectors.toList());
+        LambdaQueryWrapper<ContactTag> tagQuery = new LambdaQueryWrapper<>();
+        tagQuery.in(ContactTag::getTagId, tagIds);
+        List<ContactTag> tags = contactTagMapper.selectList(tagQuery);
+
+        return tags.stream().map(tag -> {
+            TagVO vo = new TagVO();
+            vo.setTagId(tag.getTagId());
+            vo.setTagName(tag.getTagName());
+            vo.setTagColor(tag.getTagColor());
+            return vo;
+        }).collect(Collectors.toList());
     }
 }

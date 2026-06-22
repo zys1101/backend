@@ -118,4 +118,10 @@ public class ContactDetailVO implements Serializable {
      */
     @Schema(description = "事项列表")
     private List<MatterVO> matters;
+
+    /**
+     * 标签列表
+     */
+    @Schema(description = "标签列表")
+    private List<TagVO> tags;
 }

@@ -7,7 +7,9 @@ import com.contact.common.utils.JwtUtil;
 import com.contact.common.utils.UserContext;
 import com.contact.dto.LoginDTO;
 import com.contact.dto.RefreshTokenDTO;
+import com.contact.entity.UserTheme;
 import com.contact.entity.UserInfo;
+import com.contact.mapper.UserThemeMapper;
 import com.contact.mapper.UserInfoMapper;
 import com.contact.service.UserInfoService;
 import com.contact.vo.CurrentUserVO;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 public class UserInfoServiceImpl implements UserInfoService {
 
     private final UserInfoMapper userInfoMapper;
+    private final UserThemeMapper userThemeMapper;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -155,6 +158,10 @@ public class UserInfoServiceImpl implements UserInfoService {
         currentUserVO.setUsername(user.getUsername());
         currentUserVO.setCreatedAt(user.getCreatedAt());
         currentUserVO.setLastLoginAt(user.getLastLoginAt());
+
+        // 获取主题偏好
+        UserTheme userTheme = userThemeMapper.selectById(userId);
+        currentUserVO.setTheme(userTheme != null ? userTheme.getTheme() : "light");
 
         return currentUserVO;
     }

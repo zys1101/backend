@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -111,4 +112,10 @@ public class ContactVO implements Serializable {
     @Schema(description = "更新时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+
+    /**
+     * 标签列表
+     */
+    @Schema(description = "标签列表")
+    private List<String> tags;
 }

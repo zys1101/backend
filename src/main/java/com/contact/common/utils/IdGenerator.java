@@ -18,6 +18,7 @@ public class IdGenerator {
     private static final AtomicLong CONTACT_COUNTER = new AtomicLong(1);
     private static final AtomicLong MATTER_COUNTER = new AtomicLong(1);
     private static final AtomicLong PICTURE_COUNTER = new AtomicLong(1);
+    private static final AtomicLong TAG_COUNTER = new AtomicLong(1);
 
     /**
      * 根据数据库中已有的最大ID初始化计数器，避免重启后生成重复ID。
@@ -27,13 +28,24 @@ public class IdGenerator {
      * @param maxContactId 数据库中最大联系人ID
      * @param maxMatterId  数据库中最大事项ID
      * @param maxPictureId 数据库中最大图片ID
+     * @param maxTagId     数据库中最大标签ID
      */
     public static void initFromExistingMaxId(String maxUserId, String maxContactId,
-                                              String maxMatterId, String maxPictureId) {
+                                              String maxMatterId, String maxPictureId,
+                                              String maxTagId) {
         initCounter(USER_COUNTER, maxUserId);
         initCounter(CONTACT_COUNTER, maxContactId);
         initCounter(MATTER_COUNTER, maxMatterId);
         initCounter(PICTURE_COUNTER, maxPictureId);
+        initCounter(TAG_COUNTER, maxTagId);
+    }
+    
+    /**
+     * 重载方法，兼容旧调用（不含tagId）
+     */
+    public static void initFromExistingMaxId(String maxUserId, String maxContactId,
+                                              String maxMatterId, String maxPictureId) {
+        initFromExistingMaxId(maxUserId, maxContactId, maxMatterId, maxPictureId, null);
     }
 
     private static void initCounter(AtomicLong counter, String maxId) {
@@ -81,6 +93,22 @@ public class IdGenerator {
      */
     public static String generatePictureId() {
         return generateId("P", PICTURE_COUNTER);
+    }
+
+    /**
+     * 生成标签ID
+     * 格式：T000000001
+     */
+    public static String generateTagId() {
+        return generateId("T", TAG_COUNTER);
+    }
+
+    /**
+     * 生成日志ID
+     * 格式：L000000001
+     */
+    public static String generateLogId() {
+        return generateId("L", new java.util.concurrent.atomic.AtomicLong(1));
     }
 
     /**

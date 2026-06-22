@@ -43,4 +43,10 @@ public class CurrentUserVO implements Serializable {
     @Schema(description = "最后登录时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastLoginAt;
+
+    /**
+     * 主题偏好
+     */
+    @Schema(description = "主题偏好: light / dark")
+    private String theme;
 }

@@ -3,6 +3,10 @@ package com.contact.config;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.contact.common.utils.IdGenerator;
 import com.contact.entity.Contact;
+import com.contact.entity.ContactTag;
+import com.contact.entity.ContactTagRel;
+import com.contact.mapper.ContactTagMapper;
+import com.contact.mapper.ContactTagRelMapper;
 import com.contact.entity.ContactPic;
 import com.contact.entity.Matter;
 import com.contact.entity.UserInfo;
@@ -38,6 +42,8 @@ public class DataInitRunner implements CommandLineRunner {
     private final ContactMapper contactMapper;
     private final MatterMapper matterMapper;
     private final ContactPicMapper contactPicMapper;
+    private final ContactTagMapper contactTagMapper;
+    private final ContactTagRelMapper contactTagRelMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -71,10 +77,11 @@ public class DataInitRunner implements CommandLineRunner {
         String maxContactId = queryMaxContactId();
         String maxMatterId = queryMaxMatterId();
         String maxPictureId = queryMaxPictureId();
+        String maxTagId = queryMaxTagId();
 
-        IdGenerator.initFromExistingMaxId(maxUserId, maxContactId, maxMatterId, maxPictureId);
-        log.info("IdGenerator计数器已从DB初始化: user={}, contact={}, matter={}, picture={}",
-                maxUserId, maxContactId, maxMatterId, maxPictureId);
+        IdGenerator.initFromExistingMaxId(maxUserId, maxContactId, maxMatterId, maxPictureId, maxTagId);
+        log.info("IdGenerator计数器已从DB初始化: user={}, contact={}, matter={}, picture={}, tag={}",
+                maxUserId, maxContactId, maxMatterId, maxPictureId, maxTagId);
     }
 
     private String queryMaxUserId() {
@@ -103,6 +110,13 @@ public class DataInitRunner implements CommandLineRunner {
         w.select(ContactPic::getPicId).orderByDesc(ContactPic::getPicId).last("LIMIT 1");
         ContactPic entity = contactPicMapper.selectOne(w);
         return entity != null ? entity.getPicId() : null;
+    }
+
+    private String queryMaxTagId() {
+        LambdaQueryWrapper<ContactTag> w = new LambdaQueryWrapper<>();
+        w.select(ContactTag::getTagId).orderByDesc(ContactTag::getTagId).last("LIMIT 1");
+        ContactTag entity = contactTagMapper.selectOne(w);
+        return entity != null ? entity.getTagId() : null;
     }
 
     // ==================== 用户 ====================
