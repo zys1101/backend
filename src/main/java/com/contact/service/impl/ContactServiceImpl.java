@@ -314,7 +314,13 @@ public class ContactServiceImpl implements ContactService {
 
         try {
             // 创建上传目录
-            Path uploadPath = Paths.get(avatarPath);
+            // Path uploadPath = Paths.get(avatarPath);
+            Path uploadPath = Paths.get(
+                    System.getProperty("user.dir"),
+                    avatarPath
+            ).toAbsolutePath();
+
+            log.info("上传目录: {}", uploadPath);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
