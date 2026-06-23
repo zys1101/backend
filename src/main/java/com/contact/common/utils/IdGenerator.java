@@ -19,6 +19,7 @@ public class IdGenerator {
     private static final AtomicLong MATTER_COUNTER = new AtomicLong(1);
     private static final AtomicLong PICTURE_COUNTER = new AtomicLong(1);
     private static final AtomicLong TAG_COUNTER = new AtomicLong(1);
+    private static final AtomicLong LOG_COUNTER = new AtomicLong(1);
 
     /**
      * 根据数据库中已有的最大ID初始化计数器，避免重启后生成重复ID。
@@ -108,7 +109,7 @@ public class IdGenerator {
      * 格式：L000000001
      */
     public static String generateLogId() {
-        return generateId("L", new java.util.concurrent.atomic.AtomicLong(1));
+        return generateId("L", LOG_COUNTER);
     }
 
     /**
